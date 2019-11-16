@@ -1,0 +1,11 @@
+#spring:
+#    jpa:
+#      hibernate:
+#        ddl-auto: none
+#    datasource:
+#        url: jdbc:mysql://localhost:3306/control_erp
+#        username: root
+#        password: omgapk29
+#        username: controlerp
+#        password: controlerp2019
+#        driver-class-name: com.mysql.cj.jdbc.Driver
