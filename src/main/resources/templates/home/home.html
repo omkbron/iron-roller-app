@@ -1,15 +1,22 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-	th:include="layout/layout :: page">
+<html xmlns:th="http://www.thymeleaf.org" th:include="layout/layout :: page">
 <head>
 <meta charset="UTF-8" />
 <title>Home</title>
 </head>
 <body>
-	<div th:fragment="content">
-		<div class="container pt-3">
-			<h1>Home</h1>
-		</div>
-	</div>
+    <div th:fragment="content">
+        <div class="container pt-3">
+            <h1>Menú</h1>
+
+            <div class="card" style="width: 18rem;">
+                <div class="card-body">
+                    <h5 class="card-title">Facturas</h5>
+                    <p class="card-text">Agregar addenda para La Comer.</p>
+                    <a href="#" th:href="@{/factura/upload}" class="btn btn-primary">Continuar</a>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
