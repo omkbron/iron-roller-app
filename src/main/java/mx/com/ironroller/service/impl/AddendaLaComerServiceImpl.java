@@ -7,6 +7,7 @@ import javax.xml.bind.JAXBElement;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import mx.com.ironroller.model.DatosAddenda;
@@ -23,10 +24,10 @@ import mx.com.ironroller.model.amece71.RequestForPayment.LineItem.GrossPrice;
 import mx.com.ironroller.model.amece71.RequestForPayment.LineItem.InvoicedQuantity;
 import mx.com.ironroller.model.amece71.RequestForPayment.LineItem.NetPrice;
 import mx.com.ironroller.model.amece71.RequestForPayment.LineItem.TotalLineAmount;
-import mx.com.ironroller.model.amece71.RequestForPayment.LineItem.TradeItemDescriptionInformation;
-import mx.com.ironroller.model.amece71.RequestForPayment.LineItem.TradeItemIdentification;
 import mx.com.ironroller.model.amece71.RequestForPayment.LineItem.TotalLineAmount.GrossAmount;
 import mx.com.ironroller.model.amece71.RequestForPayment.LineItem.TotalLineAmount.NetAmount;
+import mx.com.ironroller.model.amece71.RequestForPayment.LineItem.TradeItemDescriptionInformation;
+import mx.com.ironroller.model.amece71.RequestForPayment.LineItem.TradeItemIdentification;
 import mx.com.ironroller.model.amece71.RequestForPayment.OrderIdentification;
 import mx.com.ironroller.model.amece71.RequestForPayment.OrderIdentification.ReferenceIdentification;
 import mx.com.ironroller.model.amece71.RequestForPayment.PayableAmount;
@@ -40,6 +41,7 @@ import mx.com.ironroller.model.amece71.RequestForPayment.Tax;
 import mx.com.ironroller.model.amece71.RequestForPayment.TotalAllowanceCharge;
 import mx.com.ironroller.model.amece71.RequestForPayment.TotalAmount;
 import mx.com.ironroller.service.AddendaLaComerService;
+import mx.com.ironroller.service.NumberToLetterConverterService;
 import mx.gob.sat.cfd._3.Comprobante;
 import mx.gob.sat.cfd._3.Comprobante.Conceptos.Concepto;
 
@@ -49,31 +51,39 @@ public class AddendaLaComerServiceImpl implements AddendaLaComerService {
 
     private static final BigDecimal HUNDRED = BigDecimal.valueOf(100.00);
 
+    @Autowired
+    private NumberToLetterConverterService numberToLetterConverterService;
+
     @Override
     public RequestForPayment crear(Comprobante comprobante, DatosAddenda datosAddenda) {
+        log.info("Comienza creación de addenda");
         ObjectFactory of = new ObjectFactory();
 
         RequestForPayment requestForPayment = of.createRequestForPayment();
-        requestForPayment.setDeliveryDate(comprobante.getFecha());
-        requestForPayment.setDocumentStatus("ORIGINAL");
         requestForPayment.setType("SimpleInvoiceType");
+        requestForPayment.setContentVersion("1.3.1");
+        requestForPayment.setDocumentStructureVersion("AMC7.1");
+        requestForPayment.setDeliveryDate(comprobante.getFecha().toGregorianCalendar().getTime());
+        requestForPayment.setDocumentStatus("ORIGINAL");
 
         RequestForPaymentIdentification requestForPaymentIdentification = of
                 .createRequestForPaymentRequestForPaymentIdentification();
         requestForPaymentIdentification.setEntityType("INVOICE");
-        requestForPaymentIdentification
-                .setUniqueCreatorIdentification(comprobante.getSerie() + "-" + comprobante.getFolio());
+        requestForPaymentIdentification.setUniqueCreatorIdentification(comprobante.getSerie() + comprobante.getFolio());
         requestForPayment.setRequestForPaymentIdentification(requestForPaymentIdentification);
 
         SpecialInstruction specialInstructionImporte = of.createRequestForPaymentSpecialInstruction();
         specialInstructionImporte.setCode("ZZZ");
-        // TODO Pendiente de implementar
-        specialInstructionImporte.getContent().add("IMPORTE EN LETRA");
+        JAXBElement<String> textImporte = of.createRequestForPaymentSpecialInstructionText(
+                numberToLetterConverterService.obtenerImporteLetra(comprobante.getTotal(), comprobante.getMoneda()));
+        specialInstructionImporte.getContent().add(textImporte);
         requestForPayment.getSpecialInstruction().add(specialInstructionImporte);
 
         SpecialInstruction specialInstructionFormaPago = of.createRequestForPaymentSpecialInstruction();
-        specialInstructionFormaPago.setCode("ZZZ");
-        specialInstructionFormaPago.getContent().add(comprobante.getFormaPago());
+        specialInstructionFormaPago.setCode("AAB");
+        JAXBElement<String> textFormaPago = of
+                .createRequestForPaymentSpecialInstructionText(comprobante.getFormaPago());
+        specialInstructionFormaPago.getContent().add(textFormaPago);
         requestForPayment.getSpecialInstruction().add(specialInstructionFormaPago);
 
         OrderIdentification orderIdentification = of.createRequestForPaymentOrderIdentification();
@@ -82,8 +92,7 @@ public class AddendaLaComerServiceImpl implements AddendaLaComerService {
         referenceIdentification.setType("ON");
         referenceIdentification.setValue("0");
         orderIdentification.getReferenceIdentification().add(referenceIdentification);
-        //TODO Revisar el formato de la fecha
-        orderIdentification.setReferenceDate(comprobante.getFecha());
+        orderIdentification.setReferenceDate(comprobante.getFecha().toGregorianCalendar().getTime());
         requestForPayment.setOrderIdentification(orderIdentification);
 
         AdditionalInformation additionalInformation = of.createRequestForPaymentAdditionalInformation();
@@ -143,48 +152,50 @@ public class AddendaLaComerServiceImpl implements AddendaLaComerService {
             LineItem lineItem = of.createRequestForPaymentLineItem();
             lineItem.setNumber(BigInteger.valueOf(number));
             lineItem.setType("SimpleInvoiceLineItemType");
-            
-            TradeItemIdentification tradeItemIdentification = of.createRequestForPaymentLineItemTradeItemIdentification();
-            //TODO Pendeinte implementar logica para obtener codigo de producto
-            tradeItemIdentification.setGtin(concepto.getDescripcion().substring(0, 13));
+
+            TradeItemIdentification tradeItemIdentification = of
+                    .createRequestForPaymentLineItemTradeItemIdentification();
+            int indexColon = concepto.getDescripcion().indexOf(":");
+            tradeItemIdentification.setGtin(concepto.getDescripcion().substring(0, indexColon));
             lineItem.setTradeItemIdentification(tradeItemIdentification);
-            
-            TradeItemDescriptionInformation tradeItemDescriptionInformation = of.createRequestForPaymentLineItemTradeItemDescriptionInformation();
+
+            TradeItemDescriptionInformation tradeItemDescriptionInformation = of
+                    .createRequestForPaymentLineItemTradeItemDescriptionInformation();
             tradeItemDescriptionInformation.setLanguage("ES");
-          //TODO Pendeinte implementar logica para obtener descripcion de producto
-            tradeItemDescriptionInformation.setLongText(concepto.getDescripcion().substring(13));
+            tradeItemDescriptionInformation.setLongText(concepto.getDescripcion().substring(indexColon + 1));
             lineItem.setTradeItemDescriptionInformation(tradeItemDescriptionInformation);
-            
+
             InvoicedQuantity invoicedQuantity = of.createRequestForPaymentLineItemInvoicedQuantity();
-            //TODO Pendiente implementar logica para obtener clave de unidad equivalente
-            invoicedQuantity.setUnitOfMeasure(concepto.getClaveUnidad());
+            invoicedQuantity.setUnitOfMeasure(obtenerUnidadEquivalente(concepto.getClaveUnidad()));
             invoicedQuantity.setValue(concepto.getCantidad());
             lineItem.setInvoicedQuantity(invoicedQuantity);
-            
+
             GrossPrice grossPrice = of.createRequestForPaymentLineItemGrossPrice();
-            //TODO Pendiente revisar si es correcto
+            // Precio bruto sin descuentos ni cargos
             grossPrice.setAmount(concepto.getValorUnitario());
             lineItem.setGrossPrice(grossPrice);
-            
+
             NetPrice netPrice = of.createRequestForPaymentLineItemNetPrice();
-            //TODO Pendiente revisar si es correcto
+            // Precio neto
             netPrice.setAmount(concepto.getValorUnitario());
             lineItem.setNetPrice(netPrice);
-            
-            mx.com.ironroller.model.amece71.RequestForPayment.LineItem.AdditionalInformation additionalInformationLineItem = of.createRequestForPaymentLineItemAdditionalInformation();
-            mx.com.ironroller.model.amece71.RequestForPayment.LineItem.AdditionalInformation.ReferenceIdentification referenceIdentificationLineItem = of.createRequestForPaymentLineItemAdditionalInformationReferenceIdentification();
+
+            mx.com.ironroller.model.amece71.RequestForPayment.LineItem.AdditionalInformation additionalInformationLineItem = of
+                    .createRequestForPaymentLineItemAdditionalInformation();
+            mx.com.ironroller.model.amece71.RequestForPayment.LineItem.AdditionalInformation.ReferenceIdentification referenceIdentificationLineItem = of
+                    .createRequestForPaymentLineItemAdditionalInformationReferenceIdentification();
             referenceIdentificationLineItem.setType("ON");
             referenceIdentificationLineItem.setValue("0");
             additionalInformationLineItem.setReferenceIdentification(referenceIdentificationLineItem);
             lineItem.setAdditionalInformation(additionalInformationLineItem);
-            
+
             TotalLineAmount totalLineAmount = of.createRequestForPaymentLineItemTotalLineAmount();
             GrossAmount grossAmount = of.createRequestForPaymentLineItemTotalLineAmountGrossAmount();
-            //TODO Pendiente revisar si es correcto
+            // Importe bruto = (cantidad * precio bruto unitario) + cargos - descuentos
             grossAmount.setAmount(concepto.getImporte());
             totalLineAmount.setGrossAmount(grossAmount);
             NetAmount netAmount = of.createRequestForPaymentLineItemTotalLineAmountNetAmount();
-            //TODO Pendiente revisar si es correcto
+            // Importe neto = (cantidad * precio neto unitario)
             netAmount.setAmount(concepto.getImporte());
             totalLineAmount.setNetAmount(netAmount);
             lineItem.setTotalLineAmount(totalLineAmount);
@@ -193,7 +204,7 @@ public class AddendaLaComerServiceImpl implements AddendaLaComerService {
         }
 
         TotalAmount totalAmount = of.createRequestForPaymentTotalAmount();
-        totalAmount.setAmount(comprobante.getTotal());
+        totalAmount.setAmount(comprobante.getSubTotal());
         requestForPayment.setTotalAmount(totalAmount);
 
         TotalAllowanceCharge totalAllowanceCharge = of.createRequestForPaymentTotalAllowanceCharge();
@@ -215,12 +226,24 @@ public class AddendaLaComerServiceImpl implements AddendaLaComerService {
                 .multiply(HUNDRED).setScale(2, BigDecimal.ROUND_HALF_UP));
         tax.setTaxAmount(comprobante.getImpuestos().getTotalImpuestosTrasladados());
         requestForPayment.getTax().add(tax);
-        
+
         PayableAmount payableAmount = of.createRequestForPaymentPayableAmount();
         payableAmount.setAmount(comprobante.getTotal());
         requestForPayment.setPayableAmount(payableAmount);
-        
+
         return requestForPayment;
+    }
+
+    private String obtenerUnidadEquivalente(String claveUnidad) {
+        switch (claveUnidad) {
+        case "H87":
+        case "SET":
+        case "KT":
+        case "PR":
+            return "PCE";
+        default:
+            throw new RuntimeException("No se encontro equivalencia para la unidad de medida " + claveUnidad);
+        }
     }
 
 }

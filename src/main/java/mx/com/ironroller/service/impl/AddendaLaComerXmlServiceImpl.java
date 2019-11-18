@@ -10,6 +10,13 @@ import java.io.UnsupportedEncodingException;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
+import org.jdom.Content;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.Namespace;
+import org.jdom.input.SAXBuilder;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,5 +84,35 @@ public class AddendaLaComerXmlServiceImpl extends XmlService implements AddendaL
     @Override
     public Comprobante convierteByteArrayEnAddenda(byte[] xmlAddenda) {
         return (Comprobante) addendaLaComerMarshaller.unmarshal(new StreamSource(new ByteArrayInputStream(xmlAddenda)));
+    }
+
+    @Override
+    public byte[] agregaAddenda(byte[] xmlCfdi, byte[] xmlAddenda) {
+        SAXBuilder builder = new SAXBuilder();
+        try {
+            Document documentoCFD = (Document) builder.build(new ByteArrayInputStream(xmlAddenda));
+            Document documentoCFDI = (Document) builder.build(new ByteArrayInputStream(xmlCfdi));
+            Element addenda = new Element("Addenda", Namespace.getNamespace("cfdi", "http://www.sat.gob.mx/cfd/3"));
+            addenda.addContent((Content) documentoCFD.getRootElement().clone());
+
+            if (documentoCFDI.getRootElement().getChild("Addenda",
+                    Namespace.getNamespace("cfdi", "http://www.sat.gob.mx/cfd/3")) != null) {
+                documentoCFDI.getRootElement().removeChild("Addenda",
+                        Namespace.getNamespace("cfdi", "http://www.sat.gob.mx/cfd/3"));
+            }
+
+            documentoCFDI.getRootElement().addContent((Element) addenda.clone());
+            log.info("addenda agregada");
+
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            XMLOutputter outputter = new XMLOutputter();
+            outputter.setFormat(Format.getPrettyFormat().setEncoding("UTF-8"));
+            // outputter.setFormat(Format.getCompactFormat().setEncoding("UTF-8"));
+            outputter.output(documentoCFDI, baos);
+            return baos.toByteArray();
+        } catch (Exception e) {
+            log.error("Ocurrio un error al agregar la addenda.", e);
+            return null;
+        }
     }
 }

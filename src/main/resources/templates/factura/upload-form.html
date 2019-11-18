@@ -7,7 +7,7 @@
 <body>
     <div th:fragment="content">
         <div class="container pt-3">
-            <h1>Agregar addenda</h1>
+            <h2>Agregar addenda</h2>
             <div th:if="${message}">
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
                     <span th:text="${message}"></span>
@@ -16,7 +16,7 @@
                     </button>
                 </div>
             </div>
-            <div class="card">
+            <div class="card mt-4">
                 <div class="card-header">Seleccione la factura a la que se le agregará la addenda</div>
                 <div class="card-body">
                     <form action="/factura/process-upload" method="post" enctype="multipart/form-data">
@@ -32,6 +32,7 @@
                         </div>
                     </form>
                 </div>
+                <div class="card-footer">&nbsp;</div>
             </div>
         </div>
     </div>

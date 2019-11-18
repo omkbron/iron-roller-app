@@ -17,4 +17,6 @@ public interface AddendaLaComerXmlService {
 
 	void imprimeEnConsola(RequestForPayment requestForPayment);
 
+    byte[] agregaAddenda(byte[] xmlCfdi, byte[] xmlAddenda);
+
 }

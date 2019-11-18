@@ -7,14 +7,13 @@
 <body>
     <div th:fragment="content">
         <div class="container pt-3">
-            <div class="card">
+            <h2>
+                Factura <span class="font-weight-bold" th:text="${comprobante.serie} + '-' + ${comprobante.folio}"></span>
+            </h2>
+            <div class="card mt-4">
                 <form action="/factura/addenda" method="post" th:object="${datosAddenda}">
-                    <div class="card-header">
-                        Factura <span class="font-weight-bold"
-                            th:text="${comprobante.serie} + '-' + ${comprobante.folio}"></span>
-                    </div>
+                    <div class="card-header">Ingrese los datos adicionales para generar la addenda</div>
                     <div class="card-body">
-
                         <div class="form-row">
                             <div class="form-group col-md-3">
                                 <label for="serie">Serie</label> <input type="text" class="form-control" id="serie"
@@ -57,18 +56,21 @@
                             <div class="form-group col-md-4">
                                 <label for="numeroAutorizacion">Número de Autorización</label> <input type="text"
                                     class="form-control" id="numeroAutorizacion" name="numeroAutorizacion"
-                                    th:field="*{numeroAutorizacion}" placeholder="Número de Autorización">
+                                    th:field="*{numeroAutorizacion}" placeholder="Número de Autorización"> <small
+                                    class="form-text text-danger" th:if="${#fields.hasErrors('numeroAutorizacion')}"
+                                    th:errors="*{numeroAutorizacion}">error1</small>
                             </div>
                             <div class="form-group col-md-8">
                                 <label for="contactoCompras">Contacto de Compras</label> <input type="text"
                                     class="form-control" id="contactoCompras" name="contactoCompras"
                                     th:field="*{contactoCompras}"
-                                    placeholder="Nombre o Departamento del contacto de Compras">
+                                    placeholder="Nombre o Departamento del contacto de Compras"> <small
+                                    class="form-text text-danger" th:if="${#fields.hasErrors('contactoCompras')}"
+                                    th:errors="*{contactoCompras}">error2</small>
                             </div>
                         </div>
-
                     </div>
-                    <div class="card-footer">
+                    <div class="card-footer text-right">
                         <button class="btn btn-primary" type="submit" id="submitAddenda">Generar Addenda</button>
                     </div>
                 </form>
