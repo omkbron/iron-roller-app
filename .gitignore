@@ -1,31 +1,60 @@
-HELP.md
-target/
-!.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**
-!**/src/test/**
+#Global#
+ ###############
+*.log
+*.log*
+.DS_Store
 
-### STS ###
-.apt_generated
+#Android
+ ###############
+# built application files
+*.apk
+*.ap_
+
+# files for the dex VM
+ ###############
+*.dex
+
+# Java class files
+ ###############
+*.class
+
+# generated files
+ ###############
+bin/
+gen/
+
+# Local configuration file (sdk path, etc)
+ ###############
+local.properties
+
+# Eclipse project files
+ ###############
 .classpath
-.factorypath
 .project
 .settings
-.springBeans
-.sts4-cache
 
-### IntelliJ IDEA ###
-.idea
-*.iws
+#Java
+ ###############
+*.class
+
+# Package Files #
+ ###############
+*.war
+*.ear
+
+#IntelliJ
+ ###############
 *.iml
 *.ipr
+*.iws
+.idea/
 
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-build/
+#Gradle
+ ###############
+.gradle
+build
+bin
 
-### VS Code ###
-.vscode/
+#Maven.gitignore#
+ ###############
+target/
