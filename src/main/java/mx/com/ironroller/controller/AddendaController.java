@@ -20,12 +20,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.SessionAttribute;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import mx.com.ironroller.model.ComprobanteInvalidoException;
 import mx.com.ironroller.model.DatosAddenda;
 import mx.com.ironroller.model.UploadedFile;
 import mx.com.ironroller.model.amece71.RequestForPayment;
 import mx.com.ironroller.service.AddendaLaComerService;
 import mx.com.ironroller.service.AddendaLaComerXmlService;
 import mx.com.ironroller.service.FacturaService;
+import mx.com.ironroller.service.NotificacionService;
 import mx.gob.sat.cfd._3.Comprobante;
 
 @Controller
@@ -40,6 +42,9 @@ public class AddendaController {
 
     @Autowired
     private AddendaLaComerXmlService addendaLaComerXmlService;
+    
+    @Autowired
+    private NotificacionService notificacionService;
 
     @GetMapping("/factura/preview")
     public String facturaPreview(@SessionAttribute("uploadedFile") UploadedFile uploadedFile,
@@ -73,6 +78,7 @@ public class AddendaController {
 
         RequestForPayment requestForPayment = addendaLaComerService.crear(comprobante, datosAddenda);
         uploadedFile.setRequestForPayment(requestForPayment);
+        notificacionService.notificacionAddendaCreada(comprobante);
         return "redirect:/factura/download";
     }
 
@@ -107,6 +113,12 @@ public class AddendaController {
     @ExceptionHandler(ServletRequestBindingException.class)
     public String sessionError(RedirectAttributes redirectAttributes) {
         redirectAttributes.addFlashAttribute("message", "La sesión ha expirado.");
+        return "redirect:/factura/upload";
+    }
+    
+    @ExceptionHandler(ComprobanteInvalidoException.class)
+    public String comprobanteInvalido(Exception ex, RedirectAttributes redirectAttributes) {
+        redirectAttributes.addFlashAttribute("message", ex.getMessage());
         return "redirect:/factura/upload";
     }
 }
