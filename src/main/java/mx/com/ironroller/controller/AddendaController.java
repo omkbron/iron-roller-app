@@ -22,7 +22,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import mx.com.ironroller.model.ComprobanteInvalidoException;
 import mx.com.ironroller.model.DatosAddenda;
-import mx.com.ironroller.model.IronRollerAppException;
+import mx.com.ironroller.model.ConceptoDescripcionException;
 import mx.com.ironroller.model.UploadedFile;
 import mx.com.ironroller.model.amece71.RequestForPayment;
 import mx.com.ironroller.service.AddendaLaComerService;
@@ -117,8 +117,8 @@ public class AddendaController {
         return "redirect:/factura/upload";
     }
     
-    @ExceptionHandler(IronRollerAppException.class)
-    public String descripcionConceptoError(IronRollerAppException ex, RedirectAttributes redirectAttributes) {
+    @ExceptionHandler(ConceptoDescripcionException.class)
+    public String descripcionConceptoError(ConceptoDescripcionException ex, RedirectAttributes redirectAttributes) {
         redirectAttributes.addFlashAttribute("message", ex.getMessage());
         return "redirect:/factura/upload";
     }
