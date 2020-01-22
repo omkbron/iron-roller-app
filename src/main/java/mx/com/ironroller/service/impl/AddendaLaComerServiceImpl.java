@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import mx.com.ironroller.model.DatosAddenda;
+import mx.com.ironroller.model.IronRollerAppException;
 import mx.com.ironroller.model.amece71.ObjectFactory;
 import mx.com.ironroller.model.amece71.RequestForPayment;
 import mx.com.ironroller.model.amece71.RequestForPayment.AdditionalInformation;
@@ -156,6 +157,9 @@ public class AddendaLaComerServiceImpl implements AddendaLaComerService {
             TradeItemIdentification tradeItemIdentification = of
                     .createRequestForPaymentLineItemTradeItemIdentification();
             int indexColon = concepto.getDescripcion().indexOf(":");
+            if (indexColon == -1) {
+            	throw new IronRollerAppException("La descripcion '" + concepto.getDescripcion() + "' de la partida es errónea, favor de verificar.");
+            }
             tradeItemIdentification.setGtin(concepto.getDescripcion().substring(0, indexColon));
             lineItem.setTradeItemIdentification(tradeItemIdentification);
 

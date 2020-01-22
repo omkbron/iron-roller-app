@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.SessionAttribute;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import mx.com.ironroller.model.DatosAddenda;
+import mx.com.ironroller.model.IronRollerAppException;
 import mx.com.ironroller.model.UploadedFile;
 import mx.com.ironroller.model.amece71.RequestForPayment;
 import mx.com.ironroller.service.AddendaLaComerService;
@@ -109,4 +110,11 @@ public class AddendaController {
         redirectAttributes.addFlashAttribute("message", "La sesión ha expirado.");
         return "redirect:/factura/upload";
     }
+    
+    @ExceptionHandler(IronRollerAppException.class)
+    public String descripcionConceptoError(IronRollerAppException ex, RedirectAttributes redirectAttributes) {
+        redirectAttributes.addFlashAttribute("message", ex.getMessage());
+        return "redirect:/factura/upload";
+    }
+    
 }
