@@ -3,7 +3,7 @@ package mx.com.ironroller.service;
 import java.io.InputStream;
 
 import mx.com.ironroller.model.amece71.RequestForPayment;
-import mx.gob.sat.cfd._3.Comprobante;
+import mx.gob.sat.cfd._4.Comprobante;
 
 public interface AddendaLaComerXmlService {
 

@@ -5,6 +5,7 @@ import java.io.ByteArrayInputStream;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
+import mx.gob.sat.cfd._4.Comprobante;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +30,6 @@ import mx.com.ironroller.service.AddendaLaComerService;
 import mx.com.ironroller.service.AddendaLaComerXmlService;
 import mx.com.ironroller.service.FacturaService;
 import mx.com.ironroller.service.NotificacionService;
-import mx.gob.sat.cfd._3.Comprobante;
 
 @Controller
 public class AddendaController {

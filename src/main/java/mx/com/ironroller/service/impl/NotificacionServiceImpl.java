@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 
 import mx.com.ironroller.service.MailService;
 import mx.com.ironroller.service.NotificacionService;
-import mx.gob.sat.cfd._3.Comprobante;
+import mx.gob.sat.cfd._4.Comprobante;
 
 @Service
 public class NotificacionServiceImpl implements NotificacionService {

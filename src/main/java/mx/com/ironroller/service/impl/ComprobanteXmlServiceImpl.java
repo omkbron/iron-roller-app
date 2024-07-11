@@ -18,8 +18,8 @@ import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import org.springframework.stereotype.Service;
 
 import mx.com.ironroller.service.ComprobanteXmlService;
-import mx.gob.sat.cfd._3.Comprobante;
-import mx.gob.sat.cfd._3.Comprobante.Complemento;
+import mx.gob.sat.cfd._4.Comprobante;
+import mx.gob.sat.cfd._4.Comprobante.Complemento;
 import mx.gob.sat.timbrefiscaldigital.TimbreFiscalDigital;
 
 @Service
@@ -82,12 +82,10 @@ public class ComprobanteXmlServiceImpl extends XmlService implements Comprobante
 
     @Override
     public TimbreFiscalDigital obtenerComplementoTimbreFiscal(Comprobante comprobante) {
-        if (comprobante != null) {
-            for (Complemento comprobanteComplemento : comprobante.getComplemento()) {
-                for (Object complemento : comprobanteComplemento.getAny()) {
-                    if (complemento instanceof TimbreFiscalDigital) {
-                        return (TimbreFiscalDigital) complemento;
-                    }
+        if (comprobante != null && comprobante.getComplemento() != null) {
+            for (Object complemento : comprobante.getComplemento().getAny()) {
+                if (complemento instanceof TimbreFiscalDigital) {
+                    return (TimbreFiscalDigital) complemento;
                 }
             }
         }
