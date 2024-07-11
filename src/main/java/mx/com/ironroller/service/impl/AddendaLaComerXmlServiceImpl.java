@@ -26,7 +26,7 @@ import org.springframework.stereotype.Service;
 
 import mx.com.ironroller.model.amece71.RequestForPayment;
 import mx.com.ironroller.service.AddendaLaComerXmlService;
-import mx.gob.sat.cfd._3.Comprobante;
+import mx.gob.sat.cfd._4.Comprobante;
 
 @Service
 public class AddendaLaComerXmlServiceImpl extends XmlService implements AddendaLaComerXmlService {

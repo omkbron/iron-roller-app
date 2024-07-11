@@ -1,6 +1,6 @@
 package mx.com.ironroller.service;
 
-import mx.gob.sat.cfd._3.Comprobante;
+import mx.gob.sat.cfd._4.Comprobante;
 
 public interface FacturaService {
 

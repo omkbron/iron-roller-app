@@ -43,8 +43,8 @@ import mx.com.ironroller.model.amece71.RequestForPayment.TotalAllowanceCharge;
 import mx.com.ironroller.model.amece71.RequestForPayment.TotalAmount;
 import mx.com.ironroller.service.AddendaLaComerService;
 import mx.com.ironroller.service.NumberToLetterConverterService;
-import mx.gob.sat.cfd._3.Comprobante;
-import mx.gob.sat.cfd._3.Comprobante.Conceptos.Concepto;
+import mx.gob.sat.cfd._4.Comprobante;
+import mx.gob.sat.cfd._4.Comprobante.Conceptos.Concepto;
 
 @Service
 public class AddendaLaComerServiceImpl implements AddendaLaComerService {

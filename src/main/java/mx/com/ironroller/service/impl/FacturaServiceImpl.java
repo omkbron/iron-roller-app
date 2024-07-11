@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import mx.com.ironroller.model.ComprobanteInvalidoException;
 import mx.com.ironroller.service.ComprobanteXmlService;
 import mx.com.ironroller.service.FacturaService;
-import mx.gob.sat.cfd._3.Comprobante;
+import mx.gob.sat.cfd._4.Comprobante;
 
 @Service
 public class FacturaServiceImpl implements FacturaService {
